@@ -5,6 +5,28 @@ export interface WLEDDevice {
   ip: string;
 }
 
+export interface WLEDSegment {
+  id: number;
+  start: number;
+  stop: number;
+  len: number;
+  grp: number;
+  spc: number;
+  of: number;
+  on: boolean;
+  frz: boolean;
+  bri: number;
+  cct: number;
+  col: number[][];
+  fx: number; // effect ID
+  sx: number; // speed
+  ix: number; // intensity
+  pal: number; // palette
+  sel: boolean;
+  rev: boolean;
+  mi: boolean;
+}
+
 export interface WLEDState {
   on: boolean;
   bri: number; // brightness 0-255
@@ -23,27 +45,7 @@ export interface WLEDState {
   };
   lor: number;
   mainseg: number;
-  seg: Array<{
-    id: number;
-    start: number;
-    stop: number;
-    len: number;
-    grp: number;
-    spc: number;
-    of: number;
-    on: boolean;
-    frz: boolean;
-    bri: number;
-    cct: number;
-    col: number[][];
-    fx: number; // effect ID
-    sx: number; // speed
-    ix: number; // intensity
-    pal: number; // palette
-    sel: boolean;
-    rev: boolean;
-    mi: boolean;
-  }>;
+  seg: WLEDSegment[];
 }
 
 export interface WLEDInfo {
@@ -141,7 +143,7 @@ export class WLEDClient {
   /**
    * Set WLED state
    */
-  async setState(state: Partial<WLEDState>): Promise<void> {
+  async setState(state: Partial<Omit<WLEDState, "seg">> & { seg?: Array<Partial<WLEDSegment>> }): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/json/state`, {
         method: "POST",
@@ -191,7 +193,7 @@ export class WLEDClient {
         {
           id: segment,
           col: [[r, g, b]],
-        } as any,
+        } as Partial<WLEDSegment>,
       ],
     });
   }
@@ -215,7 +217,7 @@ export class WLEDClient {
         {
           id: segment,
           fx: effectId,
-        } as any,
+        } as Partial<WLEDSegment>,
       ],
     });
   }
@@ -229,7 +231,7 @@ export class WLEDClient {
         {
           id: segment,
           sx: Math.max(0, Math.min(255, speed)),
-        } as any,
+        } as Partial<WLEDSegment>,
       ],
     });
   }
@@ -243,7 +245,7 @@ export class WLEDClient {
         {
           id: segment,
           ix: Math.max(0, Math.min(255, intensity)),
-        } as any,
+        } as Partial<WLEDSegment>,
       ],
     });
   }
@@ -257,7 +259,7 @@ export class WLEDClient {
         {
           id: segment,
           pal: paletteId,
-        } as any,
+        } as Partial<WLEDSegment>,
       ],
     });
   }

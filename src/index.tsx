@@ -119,7 +119,6 @@ function AddDeviceForm({ onDeviceAdded }: { onDeviceAdded: (device: WLEDDevice) 
  * Device Control Panel
  */
 function DeviceControl({ device, onBack }: { device: WLEDDevice; onBack: () => void }) {
-  const { push } = useNavigation();
   const [deviceState, setDeviceState] = useState<WLEDJson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -535,6 +534,7 @@ function ColorWheel({ device, onUpdate }: { device: WLEDDevice; onUpdate: () => 
     setRed(String(r));
     setGreen(String(g));
     setBlue(String(b));
+    console.log("Applying preset color:", name, r, g, b);
     setHexInput(rgbToHex(r, g, b));
   }
 
@@ -658,7 +658,7 @@ function EffectPicker({ device, effects, onUpdate }: { device: WLEDDevice; effec
   return (
     <List searchBarPlaceholder="Search effects..." onSearchTextChange={setSearchText} throttle>
       <List.Section title={`${filteredEffects.length} Effects`}>
-        {filteredEffects.map((effect, index) => {
+        {filteredEffects.map((effect) => {
           const effectId = effects.indexOf(effect);
           return (
             <List.Item
@@ -685,7 +685,6 @@ function EffectPicker({ device, effects, onUpdate }: { device: WLEDDevice; effec
 export default function Command() {
   const [devices, setDevices] = useState<WLEDDevice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDevice, setSelectedDevice] = useState<WLEDDevice | null>(null);
   const { push } = useNavigation();
 
   useEffect(() => {
@@ -739,7 +738,7 @@ export default function Command() {
   }
 
   function selectDevice(device: WLEDDevice) {
-    push(<DeviceControl device={device} onBack={() => setSelectedDevice(null)} />);
+    push(<DeviceControl device={device} onBack={() => {}} />);
   }
 
   if (devices.length === 0) {
